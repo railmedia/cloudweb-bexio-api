@@ -1,0 +1,17 @@
+.alert {
+    &.alert-warning {
+        ul li {
+            color: orange;
+        }
+    }
+    &.alert-danger {
+        ul li {
+            color: red;
+        }
+    }
+    &.alert-success {
+        ul li {
+            color: green;
+        }
+    }
+}

@@ -392,7 +392,7 @@ class DashboardController extends Controller
                         $download_id, 
                         $download->name, 
                         $client, 
-                        $download->timesheetsTotalTime
+                        $download->timesheetsTotalTime ? $download->timesheetsTotalTime : ''
                     )
                 );
 

@@ -70,6 +70,8 @@
                                 @endforeach
                                 </tbody>
                             </table>
+                        @else
+                        There are no entries in your downloads basket
                         @endif
                         </div>
                     </div>

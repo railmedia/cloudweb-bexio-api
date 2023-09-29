@@ -1,3 +1,14 @@
+## 1.0.1 - 29.09.2023
+
+### Added
+
+- Alert when adding a project to the download basket
+- Config file to hold Bexio credentials (need not be added to versioning)
+
+### Fixed
+
+- Saving projects to the download basket
+
 ## 1.0.0 - 29.09.2023
 
 ### Initial release

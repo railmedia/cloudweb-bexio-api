@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/downloads-basket', 'App\Http\Controllers\DashboardController@downloadsBasket')->name('download.basket');
     Route::post('/dashboard/downloads-basket-add', 'App\Http\Controllers\DashboardController@downloadsBasketAdd')->name('download.basket.add');
     Route::get('/dashboard/downloads-basket-export-to-csv', 'App\Http\Controllers\DashboardController@exportDownloadsBasketToCSV')->name('download.basket.export.to.csv');
+    Route::get('/dashboard/downloads-basket-detect-items-number', 'App\Http\Controllers\DashboardController@downloadsDetectNumber')->name('download.basket.detect.item.number');
 
     Route::middleware('auth')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

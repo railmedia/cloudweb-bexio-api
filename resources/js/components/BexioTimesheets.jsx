@@ -308,6 +308,16 @@ export default function( props ) {
 
     }
 
+    const deselectSelectedProjects = () => {
+        
+        let inputs = document.querySelectorAll('input[type="checkbox"]');
+        
+        for(let i = 0; i < inputs.length; i++) {
+            inputs[i].checked = false;
+        }
+
+    }
+
     const addProjectsToExportBasket = async () => {
 
         let inputs = document.querySelectorAll('input[type="checkbox"]');
@@ -343,8 +353,6 @@ export default function( props ) {
             }
 
         }
-
-        console.log(add);
         
         if( add ) {
 
@@ -355,22 +363,24 @@ export default function( props ) {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
-            }).then( response => {
+            }).then( async response => {
     
-                console.log(response.data);
-                return false;
-    
-                // setLoadingProjects(false);
-    
-                if( response.data.message && response.data.message == 'Unauthorized' ) {
-                    setRequiresBexioAuth( true );
-                    return false;
-                }
-    
-                if( response.data.error_code && response.data.error_code == 403 ) {
-                    setUnauthorizedResource( true );
-                    return false;
-                }
+                alert('The selected projects have been added to the basket');
+
+                deselectSelectedProjects();
+                setExportButtonVisbility( false );
+
+                await axios({
+                    url: '/dashboard/downloads-basket-detect-items-number',
+                    method: 'get',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                }).then( response => {
+        
+                    console.log(response.data);
+        
+                });
     
             });
             
@@ -467,7 +477,6 @@ export default function( props ) {
                     <th className="p-2 w-1/6" scope="col">Name</th>
                     <th className="p-2 w-3/6" scope="col">Timesheets</th>
                     <th className="p-2 w-1/6" scope="col">Contacts</th>
-                    <th className="p-2" scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -509,7 +518,6 @@ export default function( props ) {
                                         <td className="p-1 project-duration-total" data-projectid={ project.id }>{ project.timesheetsTotalTime }</td>
                                     </tr>
                                 }
-
                                 </tbody>
                             </table>
                             }
@@ -528,7 +536,9 @@ export default function( props ) {
                                 </>
                             }
                         </td>
-                        <td className="p-2"><button type="button" onClick={(evt) => onDeleteProject(evt)} data-index={idx}>Delete</button></td>
+                        <td className="p-2">
+                            <button type="button" onClick={(evt) => onDeleteProject(evt)} data-index={idx}><i class="fa-solid fa-trash text-red-500"></i></button>
+                        </td>
                     </tr>
                     ) }
                 ) }

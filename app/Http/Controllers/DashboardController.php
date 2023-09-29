@@ -25,7 +25,7 @@ class DashboardController extends Controller
             $this->bexioAuthRefreshToken();
         }
 
-        $oidc = new OpenIDConnectClient( 'https://idp.bexio.com', env( 'BEXIO_CLIENT_ID' ), env( 'BEXIO_CLIENT_SECRET' ) );
+        $oidc = new OpenIDConnectClient( 'https://idp.bexio.com', config( 'utilities.bexio.bexio_client_id' ), config( 'utilities.bexio.bexio_client_secret' ) );
         $oidc->setRedirectURL( route('bexio.auth') );
         $oidc->addScope( array_keys( $user->user_scopes ) );
         $auth = $oidc->authenticate();
@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
         if( $user->bexio_refresh_token ) {
             
-            $oidc = new OpenIDConnectClient( 'https://idp.bexio.com', env( 'BEXIO_CLIENT_ID' ), env( 'BEXIO_CLIENT_SECRET' ) );
+            $oidc = new OpenIDConnectClient( 'https://idp.bexio.com', config( 'utilities.bexio.bexio_client_id' ), config( 'utilities.bexio.bexio_client_secret' ) );
             $oidc->setRedirectURL( route('bexio.auth.refresh') );
             $oidc->addScope( array_keys( $user->user_scopes ) );
             $refresh_token = $oidc->refreshToken( $user->bexio_refresh_token );
@@ -321,8 +321,6 @@ class DashboardController extends Controller
             'Accept' => 'application/json',
         ])->get( 'https://api.bexio.com/2.0/timesheet', ['limit' => 2000] );
 
-        //https://api.bexio.com/3.0/users/me
-
         $response = $request->body();
 
         return $response;
@@ -334,7 +332,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $basket = UserMeta::getUserMeta( $user->id, 'downloads_basket' );
-        $basket = $basket ?? [];
+        $basket = $basket ?? '';
 
         return view('downloads.basket')
                ->with('downloads_basket', json_decode($basket));
@@ -345,7 +343,31 @@ class DashboardController extends Controller
         
         $user = Auth::user();
 
-        UserMeta::updateUserMeta( $user->id, 'downloads_basket', json_encode( $request->downloads ) );
+        $downloads = $request->downloads;
+        $basket = [];
+
+        $existing_basket = UserMeta::getUserMeta( $user->id, 'downloads_basket' );
+        $existing_basket = $existing_basket ? (array)json_decode( $existing_basket ) : [];
+        
+        if( $existing_basket ) {
+            foreach( $downloads as $id => $item ) {
+                if( isset( $existing_basket[ $id ] ) ) {
+                    $existing_basket[ $id ] = $item;
+                    unset( $downloads[$id] );
+                }
+            }
+
+        }
+
+        foreach( $downloads as $id => $item ) {
+            $existing_basket[ $id ] = $item;
+        }
+        
+        // $basket = $existing_basket ? array_merge( (array)json_decode( $existing_basket ), $request->downloads ) : $request->downloads;
+
+        $basket = json_encode( $existing_basket );
+
+        UserMeta::updateUserMeta( $user->id, 'downloads_basket', $basket );
 
         return $request->downloads;
 
@@ -400,7 +422,28 @@ class DashboardController extends Controller
 
             fclose($file);
 
+
+            UserMeta::where( [ 'user_id' => $user->id, 'meta_key' => 'downloads_basket' ] )->delete();
+            // $user_meta = UserMeta::where( [ 'id' => $user->id, 'meta_key' => 'downloads_basket' ] )->first();
+            // $user_meta->delete();
+
+
             return response()->make('', 200, $headers);
+
+        }
+
+    }
+
+    public function downloadsDetectNumber() {
+
+        $user = Auth::user();
+
+        $downloads = UserMeta::getUserMeta( $user->id, 'downloads_basket' );
+
+        if( $downloads ) {
+
+            $downloads = (array) json_decode( $downloads );
+            return count( $downloads );
 
         }
 

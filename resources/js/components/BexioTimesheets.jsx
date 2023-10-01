@@ -48,25 +48,6 @@ export default function( props ) {
 
         });
 
-        // await axios.get('/dashboard/bexio-contacts-relations-fetch', {
-        //     headers: {
-        //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        //     }
-        // }).then( response => {
-
-        //     console.log(response.data);
-
-        //     // setLoading(false);
-
-        //     // if( response.data.message && response.data.message == 'Unauthorized' ) {
-        //     //     setRequiresBexioAuth( true );
-        //     //     return false;
-        //     // }
-
-        //     // setContacts( response.data );
-
-        // });
-
     }
 
     const onSearchInputChange = evt => {
@@ -80,7 +61,6 @@ export default function( props ) {
     }
 
     const performProjectSearch = async searchTerm => {
-        // console.log( projectsSearchTerm );
 
         let term = searchTerm || projectsSearchTerm;
 
@@ -94,8 +74,6 @@ export default function( props ) {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         }).then( response => {
-
-            // console.log(response.data);
 
             setLoadingProjects(false);
 
@@ -111,15 +89,12 @@ export default function( props ) {
 
             setProjects( response.data );
 
-            // setProjects( response.data );
-
         });
 
     }
 
     const onPopularSearch = searchTerm => {
 
-        // let searchTerm = evt.target.getAttribute('data-searchterm');
         setProjectsSearchTerm( searchTerm );
 
         performProjectSearch( searchTerm );
@@ -137,13 +112,12 @@ export default function( props ) {
     const fetchAllProjectsTimesheets = async ( idx = 0 ) => {
 
         if( projects[ idx ] ) {
-            // console.log('fetched ' + idx);
+            
             await fetchProjectTimesheets( projects[ idx ].id, idx );
             let nextIdx = idx + 1;
             fetchAllProjectsTimesheets( nextIdx );
         }
 
-        // console.log('fetched all');
     }
 
     const fetchProjectTimesheets = async ( projectId, index ) => {
@@ -156,10 +130,6 @@ export default function( props ) {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         }).then( response => {
-
-            // console.log(response.data);
-
-            // setLoadingProjects(false);
 
             if( response.data.message && response.data.message == 'Unauthorized' ) {
                 setRequiresBexioAuth( true );
@@ -247,10 +217,6 @@ export default function( props ) {
             }
         }).then( response => {
 
-            console.log(response.data);
-
-            // setLoadingProjects(false);
-
             if( response.data.message && response.data.message == 'Unauthorized' ) {
                 setRequiresBexioAuth( true );
                 return false;
@@ -273,13 +239,12 @@ export default function( props ) {
     const fetchAllProjectsContacts = async ( idx = 0 ) => {
 
         if( projects[ idx ] ) {
-            // console.log('fetched ' + idx);
+            
             await fetchProjectContacts( projects[ idx ].id, idx );
             let nextIdx = idx + 1;
             fetchAllProjectsContacts( nextIdx );
         }
 
-        // console.log('fetched all');
     }
 
     const selectAllProjects = evt => {
@@ -289,7 +254,6 @@ export default function( props ) {
             inputs[i].checked = evt.target.checked;   
         }
 
-        // setExportButtonVisbility( evt.target.checked );
         checkHasSelectedProject();
 
     }

@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-// use Illuminate\Support\Facades\View;
 use Jumbojett\OpenIDConnectClient;
 use App\Models\UserMeta;
-// use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -26,19 +24,22 @@ class DashboardController extends Controller
         }
 
         $oidc = new OpenIDConnectClient( 'https://idp.bexio.com', config( 'utilities.bexio.bexio_client_id' ), config( 'utilities.bexio.bexio_client_secret' ) );
+
         $oidc->setRedirectURL( route('bexio.auth') );
         $oidc->addScope( array_keys( $user->user_scopes ) );
-        $auth = $oidc->authenticate();
+        $auth     = $oidc->authenticate();
         $response = $oidc->getTokenResponse();
 
         if( $response ) {
 
-            $access_token = isset( $response->access_token ) && $response->access_token ? $response->access_token : null;
+            $access_token  = isset( $response->access_token ) && $response->access_token ? $response->access_token : null;
             $refresh_token = isset( $response->refresh_token ) && $response->refresh_token ? $response->refresh_token : null;
 
             if( $access_token && $refresh_token ) {
+
                 $this->saveUserTokens( $user->id, $access_token, $refresh_token );
                 return redirect()->route('bexio.main');
+
             }
 
         }
@@ -56,30 +57,30 @@ class DashboardController extends Controller
             $oidc->addScope( array_keys( $user->user_scopes ) );
             $refresh_token = $oidc->refreshToken( $user->bexio_refresh_token );
 
-            $access_token = isset( $refresh_token->access_token ) && $refresh_token->access_token ? $refresh_token->access_token : null;
+            $access_token  = isset( $refresh_token->access_token ) && $refresh_token->access_token ? $refresh_token->access_token : null;
             $refresh_token = isset( $refresh_token->refresh_token ) && $refresh_token->refresh_token ? $refresh_token->refresh_token : null;
 
             if( $access_token && $refresh_token ) {
+
                 //Save access and refresh tokens to user and redirect to dashboard
                 $this->saveUserTokens( $user->id, $access_token, $refresh_token );
                 return redirect()->route('dashboard');
 
-            } else {
-                //Delete access and refresh tokens from user and redirect them to the auth route
-                $delete_access_token = UserMeta::where( ['user_id' => $user->id, 'meta_key' => 'bexio_access_token'] )->first();
-                $delete_access_token->delete();
-
-                $delete_refresh_token = UserMeta::where( ['user_id' => $user->id, 'meta_key' => 'bexio_refresh_token'] )->first();
-                $delete_refresh_token->delete();
-
-                return redirect()->route('bexio.auth');
-
             }
+            
+            //Delete access and refresh tokens from user and redirect them to the auth route
+            $delete_access_token  = UserMeta::where( ['user_id' => $user->id, 'meta_key' => 'bexio_access_token'] )->first();
+            $delete_access_token->delete();
 
-        } else {
-            //Redirect to main auth
+            $delete_refresh_token = UserMeta::where( ['user_id' => $user->id, 'meta_key' => 'bexio_refresh_token'] )->first();
+            $delete_refresh_token->delete();
+
             return redirect()->route('bexio.auth');
+
         }
+        
+        //Redirect to main auth
+        return redirect()->route('bexio.auth');
 
     }
 
@@ -87,26 +88,34 @@ class DashboardController extends Controller
 
         $user_access_token_meta = UserMeta::where(['user_id' => $user_id, 'meta_key' => 'bexio_access_token'])->first();
         if( $user_access_token_meta ) {
+
             $user_access_token_meta->meta_value = $access_token;
             $user_access_token_meta->save();
+
         } else {
+
             $user_access_token_meta = new UserMeta;
             $user_access_token_meta->user_id = $user_id;
             $user_access_token_meta->meta_key = 'bexio_access_token';
             $user_access_token_meta->meta_value = $access_token;
             $user_access_token_meta->save();
+
         }
 
         $user_refresh_token_meta = UserMeta::where(['user_id' => $user_id, 'meta_key' => 'bexio_refresh_token'])->first();
         if( $user_refresh_token_meta ) {
+
             $user_refresh_token_meta->meta_value = $refresh_token;
             $user_refresh_token_meta->save();
+
         } else {
+
             $user_access_token_meta = new UserMeta;
             $user_access_token_meta->user_id = $user_id;
             $user_access_token_meta->meta_key = 'bexio_refresh_token';
             $user_access_token_meta->meta_value = $refresh_token;
             $user_access_token_meta->save();
+
         }
 
     }
@@ -126,19 +135,14 @@ class DashboardController extends Controller
     public function bexioContactsFetch() {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withHeaders([
             'Authorization' => 'Bearer ' . $user->bexio_access_token,
-            'Accept' => 'application/json'
+            'Accept'        => 'application/json'
         ])->get( 'https://api.bexio.com/2.0/contact' );
 
         $response = $request->body();
@@ -150,14 +154,9 @@ class DashboardController extends Controller
     public function bexioContactsRelationsFetch() {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withHeaders([
@@ -178,14 +177,9 @@ class DashboardController extends Controller
     public function bexioProjectsFetch() {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withHeaders([
@@ -202,14 +196,9 @@ class DashboardController extends Controller
     public function bexioProjectsSearch( Request $request ) {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return = 'Unauthorized';
         }
 
         $request = Http::withBody(
@@ -225,7 +214,6 @@ class DashboardController extends Controller
             'Content-Type'  => 'application/json'
         ])->post('https://api.bexio.com/2.0/pr_project/search?limit=2000');
 
-
         $response = $request->body();
 
         return $response;
@@ -235,14 +223,9 @@ class DashboardController extends Controller
     public function bexioProjectFetchTimesheets( Request $request ) {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withBody(
@@ -269,14 +252,9 @@ class DashboardController extends Controller
     public function bexioProjectFetchContacts( Request $request ) {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withBody(
@@ -300,20 +278,17 @@ class DashboardController extends Controller
     }
 
     public function bexioTimesheets() {
+
         return view( 'bexio.timesheets' );
+
     }
 
     public function bexioTimesheetsFetch() {
 
         $user = Auth::user();
-        $msg  = ['message' => ''];
 
         if( ! $user->bexio_access_token ) {
-            $msg['message'] = 'Unauthorized';
-        }
-
-        if( $msg['message'] ) {
-            return $msg;
+            return 'Unauthorized';
         }
 
         $request = Http::withHeaders([
@@ -344,17 +319,20 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         $downloads = $request->downloads;
-        $basket = [];
+        $basket    = [];
 
         $existing_basket = UserMeta::getUserMeta( $user->id, 'downloads_basket' );
         $existing_basket = $existing_basket ? (array)json_decode( $existing_basket ) : [];
         
         if( $existing_basket ) {
+
             foreach( $downloads as $id => $item ) {
+
                 if( isset( $existing_basket[ $id ] ) ) {
                     $existing_basket[ $id ] = $item;
                     unset( $downloads[$id] );
                 }
+
             }
 
         }
@@ -362,8 +340,6 @@ class DashboardController extends Controller
         foreach( $downloads as $id => $item ) {
             $existing_basket[ $id ] = $item;
         }
-        
-        // $basket = $existing_basket ? array_merge( (array)json_decode( $existing_basket ), $request->downloads ) : $request->downloads;
 
         $basket = json_encode( $existing_basket );
 
@@ -424,9 +400,6 @@ class DashboardController extends Controller
 
 
             UserMeta::where( [ 'user_id' => $user->id, 'meta_key' => 'downloads_basket' ] )->delete();
-            // $user_meta = UserMeta::where( [ 'id' => $user->id, 'meta_key' => 'downloads_basket' ] )->first();
-            // $user_meta->delete();
-
 
             return response()->make('', 200, $headers);
 

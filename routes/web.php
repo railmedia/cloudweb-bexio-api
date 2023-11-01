@@ -59,6 +59,26 @@ Route::middleware('auth')->group(function () {
         'destroy'=> 'users.delete'
     ]);
 
+    Route::resource('/projects', 'App\Http\Controllers\ProjectsController')->names([
+        'index'  => 'projects.list',
+        'show'   => 'projects.show',
+        'create' => 'projects.create',
+        'store'  => 'projects.store',
+        'edit'   => 'projects.edit',
+        'update' => 'projects.update',
+        'destroy'=> 'projects.delete'
+    ]);
+
+    Route::resource('/tasks', 'App\Http\Controllers\TasksController')->names([
+        'index'  => 'tasks.list',
+        'show'   => 'tasks.show',
+        'create' => 'tasks.create',
+        'store'  => 'tasks.store',
+        'edit'   => 'tasks.edit',
+        'update' => 'tasks.update',
+        'destroy'=> 'tasks.delete'
+    ]);
+
 });
 
 require __DIR__.'/auth.php';

@@ -198,7 +198,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if( ! $user->bexio_access_token ) {
-            return = 'Unauthorized';
+            return 'Unauthorized';
         }
 
         $request = Http::withBody(

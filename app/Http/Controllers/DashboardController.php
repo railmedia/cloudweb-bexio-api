@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Jumbojett\OpenIDConnectClient;
 use App\Models\UserMeta;
+use App\Models\Project;
 
 class DashboardController extends Controller
 {
@@ -420,6 +421,14 @@ class DashboardController extends Controller
 
         }
 
+    }
+
+    public function bexioProjectsSyncCheck( Request $request ) {
+
+        $projects = Project::where('bexio_id', $request->bexioProjectId)->get();
+
+        return $projects;
+        
     }
 
 }

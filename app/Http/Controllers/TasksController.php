@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Task;
 
 class TasksController extends Controller
 {
@@ -27,7 +28,20 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $task = new Task;
+        $task->project_id  = $request->projectId;
+        $task->description = $request->description;
+        $task->time_spent  = $request->hours . ':' . sprintf( "%02d", $request->minutes );
+        $task->minutes     = (int) $request->hours * 60 + (int) $request->minutes;
+        $task->date        = $request->date;
+
+        if( ! $task->save() ) {
+            return 'There was an error saving the task. Please try again.';
+        }
+        
+        return 'Saved task!';
+        
     }
 
     /**
@@ -51,7 +65,19 @@ class TasksController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
+        $task = Task::where('id', $id)->first();
+        $task->project_id  = $request->projectId;
+        $task->description = $request->description;
+        $task->time_spent  = $request->hours . ':' . sprintf( "%02d", $request->minutes );
+        $task->minutes     = (int) $request->hours * 60 + (int) $request->minutes;
+        $task->date        = $request->date;
+
+        if( ! $task->save() ) {
+            return 'There was an error saving the task. Please try again.';
+        }
+        
+        return 'Saved task!';
     }
 
     /**
@@ -59,6 +85,12 @@ class TasksController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        return Task::destroy( $id );
+    }
+
+    public function getSingleTask( Request $request ) {
+
+        return Task::where('id', $request->task_id)->first();
+
     }
 }

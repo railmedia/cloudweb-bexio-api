@@ -21,7 +21,7 @@ window.jQuery = $;
 
             $('.password, .confirm-password').slideToggle();
     
-        },
+        }
 
     }
 
@@ -29,7 +29,7 @@ window.jQuery = $;
 
         $('body').on('click', '#change-user-pass', function(e){
             Theme.togglePasswordFields();
-          });
+        });
         
         $('body').on('click', '#generate-password', function(e){
             Theme.generateUserPassword();

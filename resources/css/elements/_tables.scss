@@ -2,4 +2,24 @@ table {
     th {
         text-align: left;
     }
+    &.data {
+        th, td {
+            line-height: 1.25rem;
+            padding: 0.875rem 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            &:first-child {
+                padding-left: 0;
+            }
+            &:last-child {
+                padding-right: 0;
+            }
+        }
+        tr {
+            &:last-child {
+                th, td {
+                    border-bottom: 0;
+                }
+            }
+        }
+    }
 }

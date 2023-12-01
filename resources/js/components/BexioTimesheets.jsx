@@ -6,11 +6,14 @@ import Flatpickr from "react-flatpickr";
 export default function( props ) {
 
     let [ loadingProjects, setLoadingProjects ] = useState(false);
+    let [ autoFetchTimesheets, setAutoFetchTimesheets ] = useState(false);
+    let [ autoFetchContacts, setAutoFetchContacts ] = useState(false);
     let [ requiresBexioAuth, setRequiresBexioAuth ] = useState(false);
     let [ unauthorizedResource, setUnauthorizedResource ] = useState(false);
     let [ timesheets, setTimesheets ] = useState([]);
     let [ projectsSearchTerm, setProjectsSearchTerm ] = useState('');
     let [ projects, setProjects ] = useState(0);
+    let [ searchNumber, setSearchNumber ] = useState(0); //How many times it has searched
     let [ dateFiltersVisibility, setDateFiltersVisibility ] = useState( false );
     let [ timesheetFilterDateFrom, setTimesheetFilterDateFrom ] = useState('');
     let [ timesheetFilterDateTo, setTimesheetFilterDateTo ] = useState('');
@@ -19,8 +22,24 @@ export default function( props ) {
     useEffect( () => {
         if( ! timesheets.length ) {
             refreshTimesheets();
-        }
+        }    
     }, [timesheets]);
+
+    useEffect( () => {
+
+        if( autoFetchTimesheets == true ) {
+            fetchAllProjectsTimesheets();
+        }
+        if( autoFetchContacts == true ) {
+            fetchAllProjectsContacts();
+        }
+        checkAllProjectsAreSynced();
+
+    }, [searchNumber]);
+
+    const testHere = () => {
+        console.log('here');
+    }
 
     const refreshTimesheets = async () => {
 
@@ -87,7 +106,10 @@ export default function( props ) {
                 return false;
             }
 
+            console.log(response.data);
+
             setProjects( response.data );
+            setSearchNumber( searchNumber + 1 );
 
         });
 
@@ -352,6 +374,65 @@ export default function( props ) {
 
     }
 
+    const checkAllProjectsAreSynced = async ( idx = 0 ) => {
+
+        if( projects[ idx ] ) {
+            
+            await checkProjectsIsSynced( projects[ idx ].id, idx );
+            let nextIdx = idx + 1;
+            checkAllProjectsAreSynced( nextIdx );
+        }
+
+    }
+
+    const checkProjectsIsSynced = async (bexioProjectId, index) => {
+
+        // setLoadingProjects(true);
+
+        await axios({
+            url: '/dashboard/project-is-synchronized',
+            method: 'post',
+            data: { bexioProjectId: bexioProjectId },
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        }).then( response => {
+
+            // console.log( response.data );
+
+            let newProjects = [...projects];
+            newProjects[index]['sync'] = response.data;
+            
+            setProjects( newProjects );
+
+        });
+
+    }
+
+    const syncProject = async (bexioProjectId, index) => {
+        
+        console.log(projects[ index ]);
+
+        await axios({
+            url: '/dashboard/synchronize-project',
+            method: 'post',
+            data: { project: projects[ index ] },
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        }).then( response => {
+
+            // console.log( response.data );
+
+            // let newProjects = [...projects];
+            // newProjects[index]['sync'] = response.data;
+            
+            // setProjects( newProjects );
+
+        });
+
+    }
+
     return (
         <>
         { loadingProjects == true &&
@@ -380,6 +461,32 @@ export default function( props ) {
         <div className="flex flex-wrap">
             <div className="w-full mb-4">
                 Popular searches: <button type="button" className="bg-gray-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center" onClick={evt => onPopularSearch('marketing')}>marketing</button>
+            </div>
+            <div className="w-full mb-4">
+                <label htmlFor="autoFetchTimesheets">Automatically pull timesheets:</label>
+                <span style={{ marginLeft: '10px' }}>
+                    <input 
+                        id="autoFetchTimesheets"
+                        type="checkbox" 
+                        checked={ autoFetchTimesheets } 
+                        onChange={ () => {
+                            setAutoFetchTimesheets( ! autoFetchTimesheets )
+                        }}
+                    />
+                </span>
+            </div>
+            <div className="w-full mb-4">
+                <label htmlFor="autoFetchContacts">Automatically pull contacts:</label>
+                <span style={{ marginLeft: '10px' }}>
+                    <input 
+                        id="autoFetchContacts"
+                        type="checkbox" 
+                        checked={ autoFetchContacts } 
+                        onChange={ () => {
+                            setAutoFetchContacts( ! autoFetchContacts )
+                        }}
+                    />
+                </span>
             </div>
             <div className="flex flex-wrap justify-center items-center mr-2">
                 <input id="search-project-by-name" className="mr-2" type="text" defaultValue={ projectsSearchTerm } onChange={ onSearchInputChange } onKeyDown={ onSearchInputKeyPress } placeholder="Search project by name" />
@@ -441,6 +548,7 @@ export default function( props ) {
                     <th className="p-2 w-1/6" scope="col">Name</th>
                     <th className="p-2 w-3/6" scope="col">Timesheets</th>
                     <th className="p-2 w-1/6" scope="col">Contacts</th>
+                    <th className="p-2 w-1/6" scope="col">Synchronized</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -454,7 +562,7 @@ export default function( props ) {
                         <td className="p-2" valign="top">{ project.name }</td>
                         <td className="p-2" valign="top">
                             <a href="#!" title="Fetch timesheets" onClick={ evt => fetchProjectTimesheets( project.id, idx ) }>
-                                <i className="fa-solid fa-code-pull-request text-green-600"></i>
+                                <i className="fa-solid fa-list-check text-green-600"></i>
                             </a>
                             { project.timesheets && 
                             <table className="w-full">
@@ -500,8 +608,25 @@ export default function( props ) {
                                 </>
                             }
                         </td>
+                        <td className="p-2" valign="top">
+                            { project.sync && 
+                                <>
+                                { project.sync.length > 0 ? (
+                                    <>
+                                        <i className="fa-solid fa-circle-check" style={{ color: 'green' }}></i> - 
+                                        <a href="#!">Go to project</a>
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="fa-regular fa-circle-xmark" style={{ color: 'red' }}></i> 
+                                        <a onClick={ evt => syncProject( project.id, idx ) }> - Sync now</a>
+                                    </>
+                                ) }
+                                </>
+                            }
+                        </td>
                         <td className="p-2">
-                            <button type="button" onClick={(evt) => onDeleteProject(evt)} data-index={idx}><i class="fa-solid fa-trash text-red-500"></i></button>
+                            <button type="button" onClick={(evt) => onDeleteProject(evt)} data-index={idx}><i className="fa-solid fa-trash text-red-500"></i></button>
                         </td>
                     </tr>
                     ) }

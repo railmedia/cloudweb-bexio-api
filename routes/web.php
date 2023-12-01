@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/bexio-projects', 'App\Http\Controllers\DashboardController@bexioProjects')->name('bexio.projects');
     Route::get('/dashboard/bexio-projects-fetch', 'App\Http\Controllers\DashboardController@bexioProjectsFetch')->name('bexio.projects.fetch');
     Route::post('/dashboard/bexio-projects-search', 'App\Http\Controllers\DashboardController@bexioProjectsSearch')->name('bexio.projects.search');
+    Route::post('/dashboard/project-is-synchronized', 'App\Http\Controllers\DashboardController@bexioProjectsSyncCheck')->name('bexio.projects.sync.check');
+    Route::post('/dashboard/synchronize-project', 'App\Http\Controllers\ProjectsController@syncProject')->name('sync.project');
     Route::post('/dashboard/bexio-project-fetch-timesheets', 'App\Http\Controllers\DashboardController@bexioProjectFetchTimesheets')->name('bexio.project.fetch.timesheets');
     Route::post('/dashboard/bexio-project-fetch-contacts', 'App\Http\Controllers\DashboardController@bexioProjectFetchContacts')->name('bexio.project.fetch.contacts');
 
@@ -69,6 +71,9 @@ Route::middleware('auth')->group(function () {
         'destroy'=> 'projects.delete'
     ]);
 
+    Route::get('/projects/{project_id}/tasks', 'App\Http\Controllers\ProjectsController@getProjectTasks')->name('project.tasks');
+    Route::get('/projects/{project_id}/contacts', 'App\Http\Controllers\ProjectsController@getProjectContacts')->name('project.contacts');
+
     Route::resource('/tasks', 'App\Http\Controllers\TasksController')->names([
         'index'  => 'tasks.list',
         'show'   => 'tasks.show',
@@ -78,6 +83,20 @@ Route::middleware('auth')->group(function () {
         'update' => 'tasks.update',
         'destroy'=> 'tasks.delete'
     ]);
+
+    Route::get('/tasks/single/{task_id}', 'App\Http\Controllers\TasksController@getSingleTask')->name('tasks.single');
+
+    Route::resource('/contacts', 'App\Http\Controllers\ContactsController')->names([
+        'index'  => 'contacts.list',
+        'show'   => 'contacts.show',
+        'create' => 'contacts.create',
+        'store'  => 'contacts.store',
+        'edit'   => 'contacts.edit',
+        'update' => 'contacts.update',
+        'destroy'=> 'contacts.delete'
+    ]);
+
+    Route::get('/contacts/single/{contact_id}', 'App\Http\Controllers\ContactsController@getSingleContact')->name('contacts.single');
 
 });
 

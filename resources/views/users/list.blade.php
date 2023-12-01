@@ -18,7 +18,7 @@
                         </div>
                         <div class="p-5">
                             @if( count( $items ) )
-                                <table class="table w-full">
+                                <table class="table w-full data">
                                     <thead>
                                     <tr>
                                         <th scope="col">#</th>

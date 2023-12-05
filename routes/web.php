@@ -71,7 +71,10 @@ Route::middleware('auth')->group(function () {
         'destroy'=> 'projects.delete'
     ]);
 
+    Route::get('/projects/all/fetch', 'App\Http\Controllers\ProjectsController@getAllProjects')->name('projects.get.all');
     Route::get('/projects/{project_id}/tasks', 'App\Http\Controllers\ProjectsController@getProjectTasks')->name('project.tasks');
+    Route::get('/projects/{project_id}/tasks/raw', 'App\Http\Controllers\ProjectsController@getProjectTasksRaw')->name('project.tasks.raw');
+    Route::get('/projects/{project_id}/contacts/raw', 'App\Http\Controllers\ProjectsController@getProjectContactsRaw')->name('project.contacts.raw');
     Route::get('/projects/{project_id}/contacts', 'App\Http\Controllers\ProjectsController@getProjectContacts')->name('project.contacts');
 
     Route::resource('/tasks', 'App\Http\Controllers\TasksController')->names([

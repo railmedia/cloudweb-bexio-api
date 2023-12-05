@@ -8,7 +8,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.scss',
                 'resources/js/app.js',
-                'resources/js/bexio.jsx'
+                'resources/js/bexio.jsx',
+                'resources/js/projects.jsx'
             ],
             refresh: true,
         }),

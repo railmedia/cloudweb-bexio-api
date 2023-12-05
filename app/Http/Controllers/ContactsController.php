@@ -41,10 +41,16 @@ class ContactsController extends Controller
         $contact->website    = $request->website;
 
         if( ! $contact->save() ) {
-            return 'There was an error saving the contact. Please try again.';
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error adding the contact. Please try again.'
+            ];
         }
         
-        return 'Saved contact!';
+        return [
+            'status' => 'success',
+            'msg'    => 'Contact added'
+        ];
 
     }
 
@@ -81,10 +87,16 @@ class ContactsController extends Controller
         $contact->website    = $request->website;
 
         if( ! $contact->save() ) {
-            return 'There was an error saving the contact. Please try again.';
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error adding the contact. Please try again.'
+            ];
         }
         
-        return 'Saved contact!';
+        return [
+            'status' => 'success',
+            'msg'    => 'Contact added'
+        ];
     }
 
     /**
@@ -92,7 +104,19 @@ class ContactsController extends Controller
      */
     public function destroy(string $id)
     {
-        return Contact::destroy( $id );
+
+        if( ! Contact::destroy( $id ) ) {
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error deleting the contact. Please try again later.'
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'msg'    => 'Contact deleted'
+        ];
+        
     }
 
     public function getSingleContact( Request $request ) {

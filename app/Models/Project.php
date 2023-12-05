@@ -11,6 +11,10 @@ class Project extends Model
     
     use HasFactory;
 
+    protected $casts = [
+        'start_date' => 'datetime:d.m.Y'
+    ];
+
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
@@ -19,6 +23,10 @@ class Project extends Model
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class);
+    }
+
+    public function getStartDateFormattedAttribute() {
+        return date( 'd.m.Y', strtotime( $this->start_date ) );
     }
 
 }

@@ -25,14 +25,14 @@
                                 @if( empty( $item->id ) )
                                     {!! Form::model( $item, [ 'url' => route( 'projects.store' ), 'class' => 'create-edit-project', 'method' => 'post', 'files' => true ] ) !!}
                                 @else
-                                    {!! Form::model( $item, [ 'url' => route( 'projects.update', ['project' => $item ] ), 'class' => 'create-edit-user', 'method' => 'put', 'files' => true ] ) !!}
+                                    {!! Form::model( $item, [ 'url' => route( 'projects.update', ['project' => $item ] ), 'class' => 'create-edit-project', 'method' => 'put', 'files' => true ] ) !!}
                                 @endif
                                 <div class="mb-3">
                                     {!! Form::label( 'title', 'Title*', [ 'class' => 'w-full' ] ) !!}
                                     {!! Form::text( 'title', old( 'title', $item->title ?? '' ), [ 'class' => 'form-control w-full' ] ) !!}
                                 </div>
                                 <div class="mb-3">
-                                    {!! Form::label( 'total_hours', 'Total assigned hours', [ 'class' => 'w-full' ] ) !!}
+                                    {!! Form::label( 'total_hours', 'Total assigned monthly hours', [ 'class' => 'w-full' ] ) !!}
                                     {!! Form::number( 'total_hours', old( 'total_hours', $item->total_hours ?? '' ), [ 'class' => 'form-control w-full' ] ) !!}
                                 </div>
                                 <div class="mb-3">

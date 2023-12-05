@@ -11,6 +11,7 @@ export default {
         './resources/js/*.{js,jsx,ts,tsx}',
         './resources/js/**/*.{js,jsx,ts,tsx}',
         './resources/js/**/**/*.{js,jsx,ts,tsx}',
+        './resources/js/**/**/**/*.{js,jsx,ts,tsx}',
     ],
     darkMode: 'class',
     theme: {
@@ -18,8 +19,10 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+				'mid-black': 'rgba(0,0,0,.5)',
+            }
         },
     },
-
     plugins: [forms],
 };

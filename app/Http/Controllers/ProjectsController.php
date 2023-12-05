@@ -126,6 +126,14 @@ class ProjectsController extends Controller
 
     }
 
+    public function getProjectTasksRaw( Request $request ) {
+        return Task::where( 'project_id', $request->project_id )->get();
+    }
+
+    public function getProjectContactsRaw( Request $request ) {
+        return Contact::where( 'project_id', $request->project_id )->get();
+    }
+
     public function getProjectContacts( Request $request ) {
         
         $project = Project::where( 'id', $request->project_id )->first();
@@ -193,4 +201,9 @@ class ProjectsController extends Controller
         }
 
     }
+
+    public function getAllProjects( Request $request ) {
+        return Project::with('contacts')->get();
+    }
+
 }

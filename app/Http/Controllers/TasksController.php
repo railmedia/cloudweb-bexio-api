@@ -37,10 +37,16 @@ class TasksController extends Controller
         $task->date        = $request->date;
 
         if( ! $task->save() ) {
-            return 'There was an error saving the task. Please try again.';
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error adding the task. Please try again.'
+            ];
         }
         
-        return 'Saved task!';
+        return [
+            'status' => 'success',
+            'msg'    => 'Task added'
+        ];
         
     }
 
@@ -74,10 +80,17 @@ class TasksController extends Controller
         $task->date        = $request->date;
 
         if( ! $task->save() ) {
-            return 'There was an error saving the task. Please try again.';
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error updating the task. Please try again.'
+            ];
         }
         
-        return 'Saved task!';
+        return [
+            'status' => 'success',
+            'msg'    => 'Task updated'
+        ];
+
     }
 
     /**
@@ -85,7 +98,17 @@ class TasksController extends Controller
      */
     public function destroy(string $id)
     {
-        return Task::destroy( $id );
+        if( ! Task::destroy( $id ) ) {
+            return [
+                'status' => 'error',
+                'msg'    => 'There was an error deleting the task. Please try again later.'
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'msg'    => 'Task deleted'
+        ];
     }
 
     public function getSingleTask( Request $request ) {

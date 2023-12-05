@@ -11,6 +11,7 @@
                 </div>
                 <div class="flex flex-row flex-wrap flex-grow mt-2">
                     @include( 'common.session_messages' )
+                    <div id="projects-main" class="w-full"></div>
                     <div class="bg-white border-transparent rounded-lg shadow-xl w-full">
                         <!-- <div class="bg-gradient-to-b from-gray-300 to-gray-100 uppercase text-gray-800 border-b-2 border-gray-300 rounded-tl-lg rounded-tr-lg p-2">
                             <h class="font-bold uppercase text-gray-600">Projects</h>

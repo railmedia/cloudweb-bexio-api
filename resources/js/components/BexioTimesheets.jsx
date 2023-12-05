@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import "flatpickr/dist/themes/material_green.css";
 import Flatpickr from "react-flatpickr";
+import Spinner from './ui/Spinner';
 
 export default function( props ) {
 
@@ -106,8 +107,6 @@ export default function( props ) {
                 return false;
             }
 
-            console.log(response.data);
-
             setProjects( response.data );
             setSearchNumber( searchNumber + 1 );
 
@@ -120,14 +119,6 @@ export default function( props ) {
         setProjectsSearchTerm( searchTerm );
 
         performProjectSearch( searchTerm );
-
-    }
-
-    const onDeleteProject = evt => {
-
-        let newProjects = [...projects];
-        newProjects.splice(evt.target.getAttribute('data-index'), 1);
-        setProjects( newProjects );
 
     }
 
@@ -613,20 +604,17 @@ export default function( props ) {
                                 <>
                                 { project.sync.length > 0 ? (
                                     <>
-                                        <i className="fa-solid fa-circle-check" style={{ color: 'green' }}></i> - 
-                                        <a href="#!">Go to project</a>
+                                        <i className="fa-solid fa-circle-check" style={{ color: 'green' }}></i> 
+                                        <a href={ `/projects/${ project.id }` }> - Go to project</a>
                                     </>
                                 ) : (
                                     <>
                                         <i className="fa-regular fa-circle-xmark" style={{ color: 'red' }}></i> 
-                                        <a onClick={ evt => syncProject( project.id, idx ) }> - Sync now</a>
+                                        <a onClick={ evt => syncProject( project.id, idx ) } className="cursor-pointer"> - Sync now</a>
                                     </>
                                 ) }
                                 </>
                             }
-                        </td>
-                        <td className="p-2">
-                            <button type="button" onClick={(evt) => onDeleteProject(evt)} data-index={idx}><i className="fa-solid fa-trash text-red-500"></i></button>
                         </td>
                     </tr>
                     ) }
